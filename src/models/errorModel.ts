@@ -4,5 +4,5 @@ export type FieldError = {
 };
 
 export type ErrorModel = {
-  errorMessages?: Array<FieldError> | null;
+  errorsMessages?: Array<FieldError> | null;
 };

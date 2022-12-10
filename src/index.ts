@@ -68,16 +68,16 @@ const getErrorMessage = (message: string, field: string): FieldError => {
 // create new video
 app.post('/videos', (req: Request, res: Response) => {
   const errors: ErrorModel = {};
-  errors.errorMessages = [];
+  errors.errorsMessages = [];
   if (!req.body.title || req.body.title.length > 40) {
-    errors.errorMessages.push(
+    errors.errorsMessages.push(
       getErrorMessage('Missing title or title length greater than 40 characters', 'title')
     );
     res.status(400).send(errors);
     return;
   }
   if (!req.body.author || req.body.author.length > 20) {
-    errors.errorMessages.push(
+    errors.errorsMessages.push(
       getErrorMessage('Missing author or author length greater than 20 characters', 'author')
     );
     res.status(400).send(errors);
@@ -118,16 +118,16 @@ app.put('/videos/:id', (req: Request, res: Response) => {
     return;
   }
   const errors: ErrorModel = {};
-  errors.errorMessages = [];
+  errors.errorsMessages = [];
   let isError = false;
   if (!req.body.title || req.body.title.length > 40) {
-    errors.errorMessages.push(
+    errors.errorsMessages.push(
       getErrorMessage('Missing title or title length greater than 40 characters', 'title')
     );
     isError = true;
   }
   if (!req.body.author || req.body.author.length > 20) {
-    errors.errorMessages.push(
+    errors.errorsMessages.push(
       getErrorMessage('Missing author or author length greater than 20 characters', 'author')
     );
     isError = true;
@@ -139,7 +139,7 @@ app.put('/videos/:id', (req: Request, res: Response) => {
       )) ||
     (req.body.availableResolutions && req.body?.availableResolutions.length === 0)
   ) {
-    errors.errorMessages.push(
+    errors.errorsMessages.push(
       getErrorMessage(
         'No resolution provided or incorrect resolutions provided',
         'availableResolutions'
@@ -149,14 +149,14 @@ app.put('/videos/:id', (req: Request, res: Response) => {
   }
 
   if (+req.body.minAgeRestriction > 18 || +req.body.minAgeRestriction < 1) {
-    errors.errorMessages.push(
+    errors.errorsMessages.push(
       getErrorMessage('Age should be null or between 1 and 18', 'minAgeRestriction')
     );
     isError = true;
   }
 
   if (req.body.publicationDate && isNaN(Date.parse(req.body.publicationDate))) {
-    errors.errorMessages.push(getErrorMessage('Incorrect date format', 'publicationDate'));
+    errors.errorsMessages.push(getErrorMessage('Incorrect date format', 'publicationDate'));
     isError = true;
   }
 

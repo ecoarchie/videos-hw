@@ -95,6 +95,7 @@ app.post('/videos', (req: Request, res: Response) => {
     },
     availableResolutions: req.body.availableResolutions,
   };
+  videosDB.push(newVideo);
 
   res.status(201).send(newVideo);
 });

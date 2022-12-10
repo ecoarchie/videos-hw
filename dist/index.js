@@ -87,6 +87,7 @@ app.post('/videos', (req, res) => {
         },
         availableResolutions: req.body.availableResolutions,
     };
+    videosDB.push(newVideo);
     res.status(201).send(newVideo);
 });
 // get video by it's ID

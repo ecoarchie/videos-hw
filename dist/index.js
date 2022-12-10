@@ -63,6 +63,7 @@ const getErrorMessage = (message, field) => {
 };
 // create new video
 app.post('/videos', (req, res) => {
+    var _a;
     const errors = {};
     errors.errorsMessages = [];
     let isError = false;
@@ -72,6 +73,12 @@ app.post('/videos', (req, res) => {
     }
     if (!req.body.author || req.body.author.length > 20) {
         errors.errorsMessages.push(getErrorMessage('Missing author or author length greater than 20 characters', 'author'));
+        isError = true;
+    }
+    if ((req.body.availableResolutions &&
+        !req.body.availableResolutions.every((element) => allResolutions.includes(element))) ||
+        (req.body.availableResolutions && ((_a = req.body) === null || _a === void 0 ? void 0 : _a.availableResolutions.length) === 0)) {
+        errors.errorsMessages.push(getErrorMessage('No resolution provided or incorrect resolutions provided', 'availableResolutions'));
         isError = true;
     }
     if (isError) {
@@ -134,16 +141,21 @@ app.put('/videos/:id', (req, res) => {
         errors.errorsMessages.push(getErrorMessage('Age should be null or between 1 and 18', 'minAgeRestriction'));
         isError = true;
     }
-    if (req.body.publicationDate && isNaN(Date.parse(req.body.publicationDate))) {
-        errors.errorsMessages.push(getErrorMessage('Incorrect date format', 'publicationDate'));
-        isError = true;
+    if (req.body.publicationDate) {
+        const regex = /^[1-9]\d{3}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/g;
+        if (isNaN(Date.parse(req.body.publicationDate)) || !regex.test(req.body.publicationDate)) {
+            errors.errorsMessages.push(getErrorMessage('Incorrect date format', 'publicationDate'));
+            isError = true;
+        }
     }
+    console.log(new Date(Date.parse(req.body.publicationDate)));
     if (isError) {
         res.status(400).send(errors);
         return;
     }
     const indexToChange = videosDB.findIndex((el) => el.id === +req.params.id);
     videosDB[indexToChange] = Object.assign(Object.assign({}, videoToUpdate), req.body);
+    console.log(videosDB);
     res.sendStatus(204);
 });
 // Delete video by ID

@@ -70,18 +70,37 @@ app.post('/videos', (req: Request, res: Response) => {
   const errors: ErrorModel = {};
   errors.errorsMessages = [];
   let isError = false;
+
   if (!req.body.title || req.body.title.length > 40) {
     errors.errorsMessages.push(
       getErrorMessage('Missing title or title length greater than 40 characters', 'title')
     );
     isError = true;
   }
+
   if (!req.body.author || req.body.author.length > 20) {
     errors.errorsMessages.push(
       getErrorMessage('Missing author or author length greater than 20 characters', 'author')
     );
     isError = true;
   }
+
+  if (
+    (req.body.availableResolutions &&
+      !req.body.availableResolutions.every((element: string) =>
+        allResolutions.includes(element)
+      )) ||
+    (req.body.availableResolutions && req.body?.availableResolutions.length === 0)
+  ) {
+    errors.errorsMessages.push(
+      getErrorMessage(
+        'No resolution provided or incorrect resolutions provided',
+        'availableResolutions'
+      )
+    );
+    isError = true;
+  }
+
   if (isError) {
     res.status(400).send(errors);
     return;
@@ -164,11 +183,14 @@ app.put('/videos/:id', (req: Request, res: Response) => {
     isError = true;
   }
 
-  if (req.body.publicationDate && isNaN(Date.parse(req.body.publicationDate))) {
-    errors.errorsMessages.push(getErrorMessage('Incorrect date format', 'publicationDate'));
-    isError = true;
+  if (req.body.publicationDate) {
+    const regex = /^[1-9]\d{3}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/g;
+    if (isNaN(Date.parse(req.body.publicationDate)) || !regex.test(req.body.publicationDate)) {
+      errors.errorsMessages.push(getErrorMessage('Incorrect date format', 'publicationDate'));
+      isError = true;
+    }
   }
-
+  console.log(new Date(Date.parse(req.body.publicationDate)));
   if (isError) {
     res.status(400).send(errors);
     return;
@@ -179,6 +201,7 @@ app.put('/videos/:id', (req: Request, res: Response) => {
     ...videoToUpdate,
     ...req.body,
   };
+  console.log(videosDB);
   res.sendStatus(204);
 });
 

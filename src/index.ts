@@ -69,17 +69,20 @@ const getErrorMessage = (message: string, field: string): FieldError => {
 app.post('/videos', (req: Request, res: Response) => {
   const errors: ErrorModel = {};
   errors.errorsMessages = [];
+  let isError = false;
   if (!req.body.title || req.body.title.length > 40) {
     errors.errorsMessages.push(
       getErrorMessage('Missing title or title length greater than 40 characters', 'title')
     );
-    res.status(400).send(errors);
-    return;
+    isError = true;
   }
   if (!req.body.author || req.body.author.length > 20) {
     errors.errorsMessages.push(
       getErrorMessage('Missing author or author length greater than 20 characters', 'author')
     );
+    isError = true;
+  }
+  if (isError) {
     res.status(400).send(errors);
     return;
   }
@@ -146,6 +149,12 @@ app.put('/videos/:id', (req: Request, res: Response) => {
       )
     );
     isError = true;
+  }
+
+  if (typeof req.body.canBeDownloaded !== 'boolean') {
+    errors.errorsMessages.push(
+      getErrorMessage('Incorrect canBeDownloaded value type', 'canBeDownloaded')
+    );
   }
 
   if (+req.body.minAgeRestriction > 18 || +req.body.minAgeRestriction < 1) {

@@ -65,13 +65,16 @@ const getErrorMessage = (message, field) => {
 app.post('/videos', (req, res) => {
     const errors = {};
     errors.errorsMessages = [];
+    let isError = false;
     if (!req.body.title || req.body.title.length > 40) {
         errors.errorsMessages.push(getErrorMessage('Missing title or title length greater than 40 characters', 'title'));
-        res.status(400).send(errors);
-        return;
+        isError = true;
     }
     if (!req.body.author || req.body.author.length > 20) {
         errors.errorsMessages.push(getErrorMessage('Missing author or author length greater than 20 characters', 'author'));
+        isError = true;
+    }
+    if (isError) {
         res.status(400).send(errors);
         return;
     }
@@ -123,6 +126,9 @@ app.put('/videos/:id', (req, res) => {
         (req.body.availableResolutions && ((_a = req.body) === null || _a === void 0 ? void 0 : _a.availableResolutions.length) === 0)) {
         errors.errorsMessages.push(getErrorMessage('No resolution provided or incorrect resolutions provided', 'availableResolutions'));
         isError = true;
+    }
+    if (typeof req.body.canBeDownloaded !== 'boolean') {
+        errors.errorsMessages.push(getErrorMessage('Incorrect canBeDownloaded value type', 'canBeDownloaded'));
     }
     if (+req.body.minAgeRestriction > 18 || +req.body.minAgeRestriction < 1) {
         errors.errorsMessages.push(getErrorMessage('Age should be null or between 1 and 18', 'minAgeRestriction'));

@@ -142,7 +142,7 @@ app.put('/videos/:id', (req, res) => {
         isError = true;
     }
     if (req.body.publicationDate) {
-        const regex = /^[1-9]\d{3}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/g;
+        const regex = /^[1-9]\d{3}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/g;
         if (isNaN(Date.parse(req.body.publicationDate)) || !regex.test(req.body.publicationDate)) {
             errors.errorsMessages.push(getErrorMessage('Incorrect date format', 'publicationDate'));
             isError = true;
@@ -169,7 +169,7 @@ app.delete('/videos/:id', (req, res) => {
     res.sendStatus(204);
 });
 // Testing. DELETE all data
-app.delete('/videos/testing/all-data', (req, res) => {
+app.delete('/testing/all-data', (req, res) => {
     videosDB.length = 0;
     console.log(videosDB);
     res.sendStatus(204);
